@@ -93,6 +93,8 @@ int main() {
     postOrderTraversal(root);
     printf("\n");
 
+    printf("Demo Test");
+
     return 0;
 }
 
