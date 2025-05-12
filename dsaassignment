@@ -1,0 +1,265 @@
+#include <stdio.h>
+#include <stdlib.h> // For malloc and free
+#include <conio.h>  // For getch (if needed)
+#define SIZE 10
+
+int arr[SIZE];
+
+// Function prototypes
+void bubble();
+void selection();
+void insertion();
+void quick_sort(int low, int high);
+int partition(int low, int high);
+void heap_sort();
+void heapify(int size, int i);
+void merge(int left, int right, int mid);
+void merge_sort(int left, int right);
+void linear();
+void binary();
+
+void bubble() {
+    int i, j, temp;
+    for (i = 0; i < SIZE - 1; i++) {
+        for (j = 0; j < SIZE - 1 - i; j++) {
+            if (arr[j] > arr[j + 1]) {
+                temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+    printf("Sorted list:\n");
+    for (i = 0; i < SIZE; i++) {
+        printf("%d\n", arr[i]);
+    }
+    getch();
+}
+
+void selection() {
+    int i, j, min_index, temp;
+    for (i = 0; i < SIZE - 1; i++) {
+        min_index = i;
+        for (j = i + 1; j < SIZE; j++) {
+            if (arr[j] < arr[min_index]) {
+                min_index = j;
+            }
+        }
+        temp = arr[i];
+        arr[i] = arr[min_index];
+        arr[min_index] = temp;
+    }
+    printf("Sorted list:\n");
+    for (i = 0; i < SIZE; i++) {
+        printf("%d\n", arr[i]);
+    }
+    getch();
+}
+
+void insertion() {
+    int i, j, temp;
+    for (i = 1; i < SIZE; i++) {
+        temp = arr[i];
+        j = i - 1;
+        while (j >= 0 && arr[j] > temp) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = temp;
+    }
+    printf("Sorted list:\n");
+    for (i = 0; i < SIZE; i++) {
+        printf("%d\n", arr[i]);
+    }
+    getch();
+}
+
+void quick_sort(int low, int high) {
+    if (low < high) {
+        int pi = partition(low, high);
+        quick_sort(low, pi - 1);
+        quick_sort(pi + 1, high);
+    }
+}
+
+int partition(int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1;
+    for (int j = low; j < high; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    }
+    int temp = arr[i + 1];
+    arr[i + 1] = arr[high];
+    arr[high] = temp;
+    return i + 1;
+}
+
+void heapify(int size, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < size && arr[left] > arr[largest])
+        largest = left;
+    if (right < size && arr[right] > arr[largest])
+        largest = right;
+    if (largest != i) {
+        int temp = arr[i];
+        arr[i] = arr[largest];
+        arr[largest] = temp;
+        heapify(size, largest);
+    }
+}
+
+void heap_sort() {
+    for (int i = SIZE / 2 - 1; i >= 0; i--)
+        heapify(SIZE, i);
+    for (int i = SIZE - 1; i > 0; i--) {
+        int temp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = temp;
+        heapify(i, 0);
+    }
+    printf("Sorted list:\n");
+    for (int i = 0; i < SIZE; i++) {
+        printf("%d\n", arr[i]);
+    }
+    getch();
+}
+
+void merge(int left, int right, int mid) {
+    int l = mid - left + 1;
+    int r = right - mid;
+
+    int *L = (int *)malloc(l * sizeof(int));
+    int *R = (int *)malloc(r * sizeof(int));
+    for (int i = 0; i < l; i++)
+        L[i] = arr[left + i];
+    for (int i = 0; i < r; i++)
+        R[i] = arr[mid + 1 + i];
+
+    int i = 0, j = 0, k = left;
+    while (i < l && j < r) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < l) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < r) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+    free(L);
+    free(R);
+}
+
+void merge_sort(int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        merge_sort(left, mid);
+        merge_sort(mid + 1, right);
+        merge(left, right, mid);
+    }
+}
+
+void linear() {
+    int num, found = 0;
+    printf("Enter number to search: ");
+    scanf("%d", &num);
+    for (int i = 0; i < SIZE; i++) {
+        if (arr[i] == num) {
+            printf("Found at position %d\n", i + 1);
+            found = 1;
+            break;
+        }
+    }
+    if (!found)
+        printf("Not found\n");
+    getch();
+}
+
+void binary() {
+    int num, start = 0, end = SIZE - 1, mid;
+    printf("Enter number to search: ");
+    scanf("%d", &num);
+    // Ensure the array is sorted before binary search
+    quick_sort(0, SIZE - 1);
+    while (start <= end) {
+        mid = (start + end) / 2;
+        if (arr[mid] == num) {
+            printf("Found at position %d\n", mid + 1);
+            getch();
+            return;
+        } else if (arr[mid] < num) {
+            start = mid + 1;
+        } else {
+            end = mid - 1;
+        }
+    }
+    printf("Not found\n");
+    getch();
+}
+
+int main() {
+    int main_choice, choice, i;
+
+    printf("Enter %d elements:\n", SIZE);
+    for (i = 0; i < SIZE; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Sorting\n");
+        printf("2. Searching\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &main_choice);
+
+        if (main_choice == 1) {
+            printf("\nSorting Techniques:\n");
+            printf("1. Bubble Sort\n");
+            printf("2. Selection Sort\n");
+            printf("3. Insertion Sort\n");
+            printf("4. Quick Sort\n");
+            printf("5. Heap Sort\n");
+            printf("6. Merge Sort\n");
+            printf("Enter your choice: ");
+            scanf("%d", &choice);
+            switch (choice) {
+                case 1: bubble(); break;
+                case 2: selection(); break;
+                case 3: insertion(); break;
+                case 4: quick_sort(0, SIZE - 1);
+                        printf("Sorted list:\n");
+                        for (i = 0; i < SIZE; i++) printf("%d\n", arr[i]);
+                        getch();
+                        break;
+                case 5: heap_sort(); break;
+                case 6: merge_sort(0, SIZE - 1);
+                        printf("Sorted list:\n");
+                        for (i = 0; i < SIZE; i++) printf("%d\n", arr[i]);
+                        getch();
+                        break;
+                default: printf("Invalid choice");
+            }
+        }
+    }
+}
